@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// 1. Define the Node structure
+struct Node {
+    int bookID;
+    struct Node* next;
+};
+
+// 2. Insert high-priority book at the beginning
+void insert_at_beginning(struct Node** head_ref, int data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->bookID = data;
+    new_node->next = (*head_ref);
+    (*head_ref) = new_node;
+    printf("Issued (High Priority): Book %d\n", data);
+}
+
+// 3. Insert normal book at the end
+void insert_at_end(struct Node** head_ref, int data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    struct Node* last = *head_ref;
+    
+    new_node->bookID = data;
+    new_node->next = NULL;
+
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        printf("Issued (Normal): Book %d\n", data);
+        return;
+    }
+
+    while (last->next != NULL) {
+        last = last->next;
+    }
+
+    last->next = new_node;
+    printf("Issued (Normal): Book %d\n", data);
+}
+
+// 4. Delete a node when a book is returned
+void delete_node(struct Node** head_ref, int key) {
+    struct Node *temp = *head_ref, *prev;
+
+    // Case 1: If head node itself holds the book ID
+    if (temp != NULL && temp->bookID == key) {
+        *head_ref = temp->next;
+        free(temp);
+        printf("Returned: Book %d\n", key);
+        return;
+    }
+
+    // Case 2: Search for the book ID
+    while (temp != NULL && temp->bookID != key) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    // Case 3: Book ID not found
+    if (temp == NULL) {
+        printf("Error: Book %d not found in records.\n", key);
+        return;
+    }
+
+    // Unlink the node and free memory
+    prev->next = temp->next;
+    free(temp);
+    printf("Returned: Book %d\n", key);
+}
+
+// 5. Traverse and display the list
+void traverse(struct Node* node) {
+    if (node == NULL) {
+        printf("The list is currently empty.\n");
+        return;
+    }
+    printf("Current Issued Books: ");
+    while (node != NULL) {
+        printf("[%d] -> ", node->bookID);
+        node = node->next;
+    }
+    printf("NULL\n");
+}
+
+// Driver program to test the logic
+int main() {
+    struct Node* libraryList = NULL;
+
+    insert_at_end(&libraryList, 101);       // Normal issue
+    insert_at_end(&libraryList, 102);       // Normal issue
+    insert_at_beginning(&libraryList, 500); // High priority issue
+    
+    traverse(libraryList);
+
+    delete_node(&libraryList, 101);         // Return book 101
+    
+    traverse(libraryList);
+
+    return 0;
+}
