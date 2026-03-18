@@ -1,0 +1,68 @@
+include <stdio.h>
+#include <stdlib.h>
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+struct Node* head = NULL; 
+void InsertEnd(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) { 
+        printf("Memory allocation failed\n");
+        return;
+    }
+    newNode->data = value;
+    newNode->next = NULL; 
+    if (head == NULL) {
+        newNode->prev = NULL;
+        head = newNode;
+        return;
+    }
+    struct Node* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+void Traverse() {
+    struct Node* temp = head;
+    if (temp == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+void DeleteValue(int value) {
+    struct Node* temp = head;
+
+    while (temp != NULL) {
+        
+        if (temp->data == value) { 
+            if (temp == head) {
+                head = temp->next;
+                if (head != NULL) head->prev = NULL;
+            } else {
+                if (temp->next != NULL) temp->next->prev = temp->prev;
+                if (temp->prev != NULL) temp->prev->next = temp->next;
+            }
+            free(temp);
+            return; 
+        }
+        temp = temp->next;
+    }
+}
+int main() {
+    InsertEnd(10);
+    InsertEnd(20);
+    DeleteValue(20);
+    InsertEnd(30);
+
+    printf("Doubly Linked List: ");
+    Traverse();
+}
